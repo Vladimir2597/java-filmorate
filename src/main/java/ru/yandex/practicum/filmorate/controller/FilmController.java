@@ -42,7 +42,7 @@ public class FilmController {
     public Film updateUser(@Valid @RequestBody Film film) {
         checkReleaseDate(film);
 
-        if (films.containsKey(film.getId())){
+        if (films.containsKey(film.getId())) {
             log.info("Film information has been updated {}", film);
             films.put(film.getId(), film);
         } else {
@@ -60,8 +60,8 @@ public class FilmController {
         }
     }
 
-    private Integer getNextId(){
-        return id ++;
+    private Integer getNextId() {
+        return id++;
     }
 
 

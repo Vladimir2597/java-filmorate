@@ -54,13 +54,14 @@ public class UserController {
 
     private void checkNameForNull(User user) {
         if ( user.getName() == null ||
-                user.getName().isBlank() ){
+                user.getName().isBlank() ) {
             user.setName(user.getLogin());
         }
     }
 
-    private Integer getNextId(){
-        return id ++;
+    private Integer getNextId() {
+
+        return id++;
     }
 
 }
