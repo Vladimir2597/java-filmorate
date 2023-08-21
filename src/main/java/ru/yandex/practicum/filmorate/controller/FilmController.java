@@ -53,7 +53,7 @@ public class FilmController {
         return film;
     }
 
-    private void checkReleaseDate(Film film) throws ValidationException{
+    private void checkReleaseDate(Film film) throws ValidationException {
         if (!LocalDate.of(1895,12,28)
                         .isBefore(film.getReleaseDate())) {
             throw new ValidationException("Дата выхода фильма не может быть раньше чем 1895-12-28");
