@@ -27,7 +27,7 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film createFilm(@Valid @RequestBody Film film) {
+    public Film createFilm(@Valid @RequestBody Film film) throws ValidationException {
 
         checkReleaseDate(film);
         film.setId(getNextId());
@@ -39,7 +39,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film updateUser(@Valid @RequestBody Film film) {
+    public Film updateUser(@Valid @RequestBody Film film) throws ValidationException {
         checkReleaseDate(film);
 
         if (films.containsKey(film.getId())) {
@@ -53,7 +53,7 @@ public class FilmController {
         return film;
     }
 
-    private void checkReleaseDate(Film film) {
+    private void checkReleaseDate(Film film) throws ValidationException{
         if (!LocalDate.of(1895,12,28)
                         .isBefore(film.getReleaseDate())) {
             throw new ValidationException("Дата выхода фильма не может быть раньше чем 1895-12-28");
