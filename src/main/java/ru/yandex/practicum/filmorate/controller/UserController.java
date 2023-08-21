@@ -2,7 +2,9 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -27,23 +29,26 @@ public class UserController {
     }
 
     @PostMapping
-    @ExceptionHandler(ValidationException.class)
     public User createUser(@Valid @RequestBody User user){
 
         checkNameForNull(user);
         user.setId(getNextId());
         users.put(user.getId(),user);
 
+        log.info("User created {}", user);
+
         return user;
     }
 
     @PutMapping
-    @ExceptionHandler(ValidationException.class)
     public User updateUser(@Valid @RequestBody User user){
         checkNameForNull(user);
-
         if(users.containsKey(user.getId())){
+            log.info("User information has been updated {}", user);
             users.put(user.getId(), user);
+        } else {
+            log.warn("User with id = {} not found!", user.getId());
+            throw new NotFoundException("User not found!");
         }
 
         return user;
@@ -59,7 +64,5 @@ public class UserController {
     private Integer getNextId(){
         return id ++;
     }
-
-
 
 }

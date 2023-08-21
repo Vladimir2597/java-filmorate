@@ -3,8 +3,8 @@ package ru.yandex.practicum.filmorate.controller;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -34,6 +34,8 @@ public class FilmController {
         film.setId(getNextId());
         films.put(film.getId(),film);
 
+        log.info("Film created {}", film);
+
         return film;
     }
 
@@ -42,16 +44,20 @@ public class FilmController {
         checkReleaseDate(film);
 
         if(films.containsKey(film.getId())){
+            log.info("Film information has been updated {}", film);
             films.put(film.getId(), film);
+        } else {
+            log.warn("Film with id = {} not found!", film.getId());
+            throw new NotFoundException("Film not found!");
         }
 
         return film;
     }
 
     private void checkReleaseDate(Film film){
-        if(LocalDate.of(1895,12,28)
+        if(!LocalDate.of(1895,12,28)
                         .isBefore(film.getReleaseDate())){
-            throw new ValidationException("Invalid release date!");
+            throw new ValidationException("Дата выхода фильма не может быть раньше чем 1895-12-28");
         }
     }
 
@@ -59,11 +65,5 @@ public class FilmController {
         return id ++;
     }
 
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<String> handleException(ValidationException exception) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(exception.getMessage());
-    }
 
 }

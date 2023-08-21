@@ -15,7 +15,7 @@ public class User {
     @NotBlank
     @Email
     private String email;
-
+    @Pattern(regexp = "^\\S*$")
     private String login;
     private String name;
     @Past
