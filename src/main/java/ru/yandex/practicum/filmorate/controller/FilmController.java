@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
@@ -28,7 +27,7 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film createFilm(@Valid @RequestBody Film film){
+    public Film createFilm(@Valid @RequestBody Film film) {
 
         checkReleaseDate(film);
         film.setId(getNextId());
@@ -40,10 +39,10 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film updateUser(@Valid @RequestBody Film film){
+    public Film updateUser(@Valid @RequestBody Film film) {
         checkReleaseDate(film);
 
-        if(films.containsKey(film.getId())){
+        if (films.containsKey(film.getId())){
             log.info("Film information has been updated {}", film);
             films.put(film.getId(), film);
         } else {
@@ -54,9 +53,9 @@ public class FilmController {
         return film;
     }
 
-    private void checkReleaseDate(Film film){
-        if(!LocalDate.of(1895,12,28)
-                        .isBefore(film.getReleaseDate())){
+    private void checkReleaseDate(Film film) {
+        if (!LocalDate.of(1895,12,28)
+                        .isBefore(film.getReleaseDate())) {
             throw new ValidationException("Дата выхода фильма не может быть раньше чем 1895-12-28");
         }
     }

@@ -2,10 +2,8 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 
@@ -29,7 +27,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@Valid @RequestBody User user){
+    public User createUser(@Valid @RequestBody User user) {
 
         checkNameForNull(user);
         user.setId(getNextId());
@@ -41,9 +39,9 @@ public class UserController {
     }
 
     @PutMapping
-    public User updateUser(@Valid @RequestBody User user){
+    public User updateUser(@Valid @RequestBody User user) {
         checkNameForNull(user);
-        if(users.containsKey(user.getId())){
+        if (users.containsKey(user.getId())) {
             log.info("User information has been updated {}", user);
             users.put(user.getId(), user);
         } else {
@@ -54,8 +52,8 @@ public class UserController {
         return user;
     }
 
-    private void checkNameForNull(User user){
-        if( user.getName() == null ||
+    private void checkNameForNull(User user) {
+        if ( user.getName() == null ||
                 user.getName().isBlank() ){
             user.setName(user.getLogin());
         }
