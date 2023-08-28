@@ -2,66 +2,41 @@ package ru.yandex.practicum.filmorate.controller;
 
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 @RestController
 @Slf4j
 @RequestMapping("/users")
 public class UserController {
-    private Map<Integer, User> users = new HashMap<>();
-    private Integer id = 1;
+    @Autowired
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping
     public List<User> getAllUsers() {
 
-        return new ArrayList<>(users.values());
+        return userService.getAllUsers();
     }
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
 
-        checkNameForNull(user);
-        user.setId(getNextId());
-        users.put(user.getId(),user);
-
-        log.info("User created {}", user);
-
-        return user;
+        return userService.createUser(user);
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        checkNameForNull(user);
-        if (users.containsKey(user.getId())) {
-            log.info("User information has been updated {}", user);
-            users.put(user.getId(), user);
-        } else {
-            log.warn("User with id = {} not found!", user.getId());
-            throw new NotFoundException("User not found!");
-        }
 
-        return user;
-    }
-
-    private void checkNameForNull(User user) {
-        if (user.getName() == null ||
-                user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-    }
-
-    private Integer getNextId() {
-
-        return id++;
+        return userService.updateUser(user);
     }
 
 }
