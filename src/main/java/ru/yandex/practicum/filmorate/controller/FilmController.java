@@ -37,10 +37,10 @@ public class FilmController {
 
     @GetMapping("/popular")
     public List<Film> getPopularFilms(@RequestParam(required = false) Optional<Integer> count) {
-        int DefaultNumberSort = 10;
+        int defaultNumberSort = 10;
 
         return filmService.getPopularFilms(count
-                .orElse(DefaultNumberSort));
+                .orElse(defaultNumberSort));
     }
 
     @PostMapping
