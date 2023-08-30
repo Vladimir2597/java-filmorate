@@ -1,56 +1,85 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class UserService {
-    private final Map<Integer, User> users = new HashMap<>();
-    private Integer id = 1;
+    private final UserStorage userStorage;
 
-    @GetMapping
+    @Autowired
+    public UserService(UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
+
     public List<User> getAllUsers() {
 
-        return new ArrayList<>(users.values());
+        return userStorage.getAllUsers();
     }
 
-    @PostMapping
-    public User createUser(@Valid @RequestBody User user) {
+    public User getUserById(long userId) {
 
-        checkNameForNull(user);
-        user.setId(getNextId());
-        users.put(user.getId(),user);
-
-        log.info("User created {}", user);
-
-        return user;
+        return userStorage.findUserById(userId);
     }
 
-    @PutMapping
-    public User updateUser(@Valid @RequestBody User user) {
+    public User createUser(User user) {
         checkNameForNull(user);
-        if (users.containsKey(user.getId())) {
-            log.info("User information has been updated {}", user);
-            users.put(user.getId(), user);
-        } else {
-            log.warn("User with id = {} not found!", user.getId());
-            throw new NotFoundException("User not found!");
-        }
 
-        return user;
+        return userStorage.createUser(user);
+    }
+
+    public User updateUser(User user) {
+        checkNameForNull(user);
+
+        return userStorage.updateUser(user);
+    }
+
+    public User addFriend(long userId, long friendId) {
+        User user = userStorage.findUserById(userId);
+        User friend = userStorage.findUserById(friendId);
+
+        user.addFriend(friendId);
+        friend.addFriend(userId);
+
+        userStorage.updateUser(friend);
+        return userStorage.updateUser(user);
+    }
+
+    public User deleteFriend(long userId, long friendId) {
+        User user = userStorage.findUserById(userId);
+        User friend = userStorage.findUserById(friendId);
+
+        user.deleteFriend(friendId);
+        friend.deleteFriend(userId);
+
+        userStorage.updateUser(friend);
+        return userStorage.updateUser(user);
+    }
+
+    public List<User> getUserFriends(long userId) {
+
+        return userStorage.findUserById(userId)
+                .getFriends().stream()
+                .map(userStorage::findUserById)
+                .collect(Collectors.toList());
+    }
+
+    public List<User> getCommonFriends(long userId, long otherUserId) {
+
+        return userStorage.findUserById(userId)
+                .getFriends().stream()
+                .filter(userStorage.findUserById(otherUserId)
+                        .getFriends()::contains)
+                .map(userStorage::findUserById)
+                .collect(Collectors.toList());
+
     }
 
     private void checkNameForNull(User user) {
@@ -60,8 +89,4 @@ public class UserService {
         }
     }
 
-    private Integer getNextId() {
-
-        return id++;
-    }
 }
