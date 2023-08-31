@@ -22,11 +22,13 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Autowired
     public InMemoryFilmStorage(UserStorage userStorage) {
+
         this.userStorage = userStorage;
     }
 
     @Override
     public List<Film> getAll() {
+
         return new ArrayList<>(films.values());
     }
 
