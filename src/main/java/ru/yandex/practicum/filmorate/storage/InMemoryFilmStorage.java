@@ -16,9 +16,10 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
+    private final UserStorage userStorage;
+
     private final Map<Long, Film> films = new HashMap<>();
     private long id = 1;
-    private final UserStorage userStorage;
 
     @Autowired
     public InMemoryFilmStorage(UserStorage userStorage) {
