@@ -24,35 +24,35 @@ public class FilmController {
     }
 
     @GetMapping
-    public List<Film> getAllFilms() {
+    public List<Film> getAll() {
 
-        return filmService.getAllFilms();
+        return filmService.getAll();
     }
 
     @GetMapping("/{id}")
-    public Film getFilmById(@PathVariable long id) {
+    public Film getById(@PathVariable long id) {
 
-        return filmService.getFilmById(id);
+        return filmService.getById(id);
     }
 
     @GetMapping("/popular")
-    public List<Film> getPopularFilms(@RequestParam(required = false) Optional<Integer> count) {
+    public List<Film> getPopular(@RequestParam(required = false) Optional<Integer> count) {
         int defaultNumberSort = 10;
 
-        return filmService.getPopularFilms(count
+        return filmService.getPopular(count
                 .orElse(defaultNumberSort));
     }
 
     @PostMapping
-    public Film createFilm(@Valid @RequestBody Film film) throws ValidationException {
+    public Film create(@Valid @RequestBody Film film) throws ValidationException {
 
-        return filmService.createFilm(film);
+        return filmService.create(film);
     }
 
     @PutMapping
-    public Film updateFilm(@Valid @RequestBody Film film) throws ValidationException {
+    public Film update(@Valid @RequestBody Film film) throws ValidationException {
 
-        return filmService.updateFilm(film);
+        return filmService.update(film);
     }
 
     @PutMapping("/{id}/like/{userId}")

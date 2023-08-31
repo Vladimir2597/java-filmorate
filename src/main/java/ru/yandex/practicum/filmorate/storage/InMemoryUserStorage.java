@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -17,12 +18,12 @@ public class InMemoryUserStorage implements UserStorage {
     private long id = 1;
 
     @Override
-    public List<User> getAllUsers() {
+    public List<User> getAll() {
         return new ArrayList<>(users.values());
     }
 
     @Override
-    public User createUser(User user) {
+    public User create(User user) {
         user.setId(getNextId());
         users.put(user.getId(), user);
 
@@ -32,7 +33,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) {
+    public User update(User user) {
 
         if (users.containsKey(user.getId())) {
             log.info("User information has been updated {}", user);
@@ -46,7 +47,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User findUserById(long userId) {
+    public User findById(long userId) {
         return users.entrySet().stream()
                 .filter(u -> u.getKey() == userId)
                 .map(u -> u.getValue())
@@ -54,6 +55,51 @@ public class InMemoryUserStorage implements UserStorage {
                 .orElseThrow(
                         () -> new NotFoundException("User with id: " + userId + " not found")
                 );
+    }
+
+    @Override
+    public User addFriend(long userId, long friendId) {
+        User user = findById(userId);
+        User friend = findById(friendId);
+
+        user.addFriend(friendId);
+        friend.addFriend(userId);
+
+        update(friend);
+        return update(user);
+    }
+
+    @Override
+    public User deleteFriend(long userId, long friendId) {
+        User user = findById(userId);
+        User friend = findById(friendId);
+
+        user.deleteFriend(friendId);
+        friend.deleteFriend(userId);
+
+        update(friend);
+        return update(user);
+    }
+
+    @Override
+    public List<User> getFriends(long userId) {
+
+        return findById(userId)
+                .getFriends().stream()
+                .map(this::findById)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> getCommonFriends(long userId, long otherUserId) {
+
+        return findById(userId)
+                .getFriends().stream()
+                .filter(findById(otherUserId)
+                        .getFriends()::contains)
+                .map(this::findById)
+                .collect(Collectors.toList());
+
     }
 
     private long getNextId() {

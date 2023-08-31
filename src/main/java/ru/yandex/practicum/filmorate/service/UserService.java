@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -19,67 +18,46 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    public List<User> getAllUsers() {
+    public List<User> getAll() {
 
-        return userStorage.getAllUsers();
+        return userStorage.getAll();
     }
 
-    public User getUserById(long userId) {
+    public User getById(long userId) {
 
-        return userStorage.findUserById(userId);
+        return userStorage.findById(userId);
     }
 
-    public User createUser(User user) {
+    public User create(User user) {
         checkNameForNull(user);
 
-        return userStorage.createUser(user);
+        return userStorage.create(user);
     }
 
-    public User updateUser(User user) {
+    public User update(User user) {
         checkNameForNull(user);
 
-        return userStorage.updateUser(user);
+        return userStorage.update(user);
     }
 
     public User addFriend(long userId, long friendId) {
-        User user = userStorage.findUserById(userId);
-        User friend = userStorage.findUserById(friendId);
 
-        user.addFriend(friendId);
-        friend.addFriend(userId);
-
-        userStorage.updateUser(friend);
-        return userStorage.updateUser(user);
+        return userStorage.addFriend(userId,friendId);
     }
 
     public User deleteFriend(long userId, long friendId) {
-        User user = userStorage.findUserById(userId);
-        User friend = userStorage.findUserById(friendId);
 
-        user.deleteFriend(friendId);
-        friend.deleteFriend(userId);
-
-        userStorage.updateUser(friend);
-        return userStorage.updateUser(user);
+        return userStorage.deleteFriend(userId,friendId);
     }
 
-    public List<User> getUserFriends(long userId) {
+    public List<User> getFriends(long userId) {
 
-        return userStorage.findUserById(userId)
-                .getFriends().stream()
-                .map(userStorage::findUserById)
-                .collect(Collectors.toList());
+        return userStorage.getFriends(userId);
     }
 
     public List<User> getCommonFriends(long userId, long otherUserId) {
 
-        return userStorage.findUserById(userId)
-                .getFriends().stream()
-                .filter(userStorage.findUserById(otherUserId)
-                        .getFriends()::contains)
-                .map(userStorage::findUserById)
-                .collect(Collectors.toList());
-
+        return userStorage.getCommonFriends(userId,otherUserId);
     }
 
     private void checkNameForNull(User user) {

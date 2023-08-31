@@ -10,77 +10,55 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
 @Slf4j
 public class FilmService {
     private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
 
     @Autowired
     public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
         this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
     }
 
-    public List<Film> getAllFilms() {
+    public List<Film> getAll() {
 
-        return filmStorage.getAllFilms();
+        return filmStorage.getAll();
     }
 
-    public Film getFilmById(long filmId) {
+    public Film getById(long filmId) {
 
-        return filmStorage.findFilmById(filmId);
+        return filmStorage.findById(filmId);
     }
 
-    public List<Film> getPopularFilms(int count) {
+    public List<Film> getPopular(int count) {
 
-        return filmStorage.getAllFilms()
-                .stream()
-                .sorted((f0, f1) -> compare(f0, f1))
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.getPopular(count);
     }
 
-    public Film createFilm(Film film) throws ValidationException {
+    public Film create(Film film) throws ValidationException {
         checkReleaseDate(film);
 
-        return filmStorage.createFilm(film);
+        return filmStorage.create(film);
     }
 
-    public Film updateFilm(Film film) throws ValidationException {
+    public Film update(Film film) throws ValidationException {
         checkReleaseDate(film);
 
-        return filmStorage.updateFilm(film);
+        return filmStorage.update(film);
     }
 
     public Film putLike(long filmId, long userId) throws ValidationException {
-        Film film = filmStorage.findFilmById(filmId);
 
-        userStorage.findUserById(userId); // check that user exists
-
-        film.putLike(userId);
-
-        return filmStorage.updateFilm(film);
+        return filmStorage.putLike(filmId,userId);
     }
 
     public Film deleteLike(long filmId, long userId) throws ValidationException {
-        Film film = filmStorage.findFilmById(filmId);
 
-        userStorage.findUserById(userId); // check that user exists
-
-        film.deleteLike(userId);
-
-        return filmStorage.updateFilm(film);
+        return filmStorage.deleteLike(filmId,userId);
     }
 
-    private int compare(Film f0, Film f1) {
-        int result = Integer.compare(f0.getLikes().size(),
-                f1.getLikes().size());
-        return -result;
-    }
 
     private void checkReleaseDate(Film film) throws ValidationException {
         if (!LocalDate.of(1895, 12, 28)
