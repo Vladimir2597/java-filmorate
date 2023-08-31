@@ -99,6 +99,7 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .limit(count)
                 .collect(Collectors.toList());
     }
+
     private int compare(Film f0, Film f1) {
         int result = Integer.compare(f0.getLikes().size(),
                 f1.getLikes().size());
